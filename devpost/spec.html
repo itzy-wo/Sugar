@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sugar — Technical Blueprint & Architecture Companion</title>
+  <style>
+    :root {
+      --bg: #F7F3EE;
+      --card-bg: #FFFFFF;
+      --text-main: #3A231A;
+      --text-muted: #7A6258;
+      --mocha: #54382B;
+      --rose: #D88A8A;
+      --rose-soft: #F9EBEA;
+      --rose-dark: #B76262;
+      --cream: #EDE4D8;
+      --border: #E8DFD5;
+      --sage: #5E8A75;
+      --sage-soft: #EBF4F0;
+      --shadow: 0 4px 20px rgba(58, 35, 26, 0.06);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 2.5rem 1.25rem;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.3rem 0.85rem;
+      background: var(--rose-soft);
+      color: var(--rose-dark);
+      font-weight: 700;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 2.3rem;
+      color: var(--mocha);
+      margin-bottom: 0.5rem;
+    }
+    .tagline {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 750px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 768px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .card.full-width {
+      grid-column: 1 / -1;
+    }
+    .card h2 {
+      font-size: 1.25rem;
+      color: var(--mocha);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Diagram SVG */
+    .svg-diagram {
+      width: 100%;
+      height: auto;
+      max-height: 320px;
+      margin: 1rem 0;
+    }
+
+    /* Tabs */
+    .tabs-nav {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 2px solid var(--cream);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 0.6rem 1.25rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-btn:hover {
+      background: var(--bg);
+      color: var(--text-main);
+    }
+    .tab-btn.active {
+      background: var(--rose-soft);
+      color: var(--rose-dark);
+    }
+    .tab-pane {
+      display: none;
+    }
+    .tab-pane.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Component List */
+    .comp-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .comp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+    }
+    .comp-name {
+      font-weight: 700;
+      color: var(--mocha);
+      font-size: 1.05rem;
+    }
+    .comp-file {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--rose-dark);
+      background: #FFFFFF;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+    .comp-ref {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    /* Roadmap box */
+    .roadmap-stage {
+      display: flex;
+      gap: 1.25rem;
+      padding: 1.2rem;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border);
+    }
+    .stage-1 { background: #FDF9F7; border-left: 5px solid var(--rose); }
+    .stage-2 { background: #F8FAF9; border-left: 5px solid var(--sage); }
+    .stage-3 { background: #FAF9F6; border-left: 5px solid var(--mocha); }
+    .stage-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      height: fit-content;
+      flex-shrink: 0;
+    }
+
+    code, pre {
+      font-family: var(--mono);
+      background: rgba(0,0,0,0.04);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.88em;
+    }
+    pre {
+      padding: 1rem;
+      overflow-x: auto;
+      line-height: 1.4;
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+    }
+
+    ul.bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+    ul.bullet-list li {
+      position: relative;
+      padding-left: 1.5rem;
+      font-size: 0.95rem;
+    }
+    ul.bullet-list li::before {
+      content: "•";
+      color: var(--rose);
+      font-size: 1.4rem;
+      position: absolute;
+      left: 0.25rem;
+      top: -0.25rem;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 2.5rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <span class="badge" style="background: var(--sage-soft); color: var(--sage);">Spec Status: Approved</span>
+      <h1>Sugar — Technical Blueprint</h1>
+      <p class="tagline">Client-side single-page architecture powered by in-browser WebAssembly engines (<code>sql.js</code> + <code>Pyodide</code>) and a custom voice & roast state machine.</p>
+    </header>
+
+    <div class="grid">
+      <!-- Architecture & Data Flow Diagram -->
+      <div class="card full-width">
+        <h2>🏗️ Client-Side Architecture & Data Flow</h2>
+        <svg class="svg-diagram" viewBox="0 0 920 250" xmlns="http://www.w3.org/2000/svg">
+          <rect width="920" height="250" rx="16" fill="#FDFBF9" stroke="#E8DFD5" stroke-width="1.5"/>
+
+          <!-- 1. Browser DOM / UI Surface -->
+          <g transform="translate(25, 35)">
+            <rect width="180" height="180" rx="12" fill="#FFFFFF" stroke="#54382B" stroke-width="2"/>
+            <text x="90" y="30" text-anchor="middle" font-weight="bold" fill="#54382B" font-size="13">Surface / UI Layer</text>
+            
+            <rect x="15" y="45" width="150" height="35" rx="6" fill="#F9EBEA"/>
+            <text x="90" y="67" text-anchor="middle" font-size="11" font-weight="bold" fill="#B76262">Splash & Preloader</text>
+            
+            <rect x="15" y="90" width="150" height="35" rx="6" fill="#EDE4D8"/>
+            <text x="90" y="112" text-anchor="middle" font-size="11" font-weight="bold" fill="#54382B">Chat Stream</text>
+
+            <rect x="15" y="135" width="150" height="35" rx="6" fill="#FFFFFF" stroke="#E8DFD5"/>
+            <text x="90" y="157" text-anchor="middle" font-size="11" fill="#7A6258">Multiline Input Bar</text>
+          </g>
+
+          <path d="M 210 125 L 245 125" stroke="#D88A8A" stroke-width="2.5" fill="none"/>
+
+          <!-- 2. State & Router -->
+          <g transform="translate(250, 45)">
+            <rect width="180" height="160" rx="12" fill="#FFFFFF" stroke="#D88A8A" stroke-width="2"/>
+            <text x="90" y="30" text-anchor="middle" font-weight="bold" fill="#54382B" font-size="13">Sugar State Machine</text>
+            <text x="90" y="55" text-anchor="middle" fill="#7A6258" font-size="11">app.js</text>
+            
+            <rect x="15" y="70" width="150" height="30" rx="6" fill="#F7F3EE"/>
+            <text x="90" y="90" text-anchor="middle" font-size="10" fill="#54382B">Track: SQL | Python</text>
+
+            <rect x="15" y="110" width="150" height="30" rx="6" fill="#F7F3EE"/>
+            <text x="90" y="130" text-anchor="middle" font-size="10" fill="#54382B">Step: 1 → 2 → 3 (Attempts)</text>
+          </g>
+
+          <path d="M 435 125 L 470 125" stroke="#D88A8A" stroke-width="2.5" fill="none"/>
+
+          <!-- 3. WebAssembly Engines -->
+          <g transform="translate(475, 35)">
+            <rect width="200" height="180" rx="12" fill="#FFFFFF" stroke="#5E8A75" stroke-width="2"/>
+            <text x="100" y="30" text-anchor="middle" font-weight="bold" fill="#5E8A75" font-size="13">WASM Execution Engines</text>
+            
+            <rect x="15" y="45" width="170" height="55" rx="8" fill="#EBF4F0" stroke="#5E8A75"/>
+            <text x="100" y="67" text-anchor="middle" font-size="12" font-weight="bold" fill="#5E8A75">sql.js (SQLite WASM)</text>
+            <text x="100" y="85" text-anchor="middle" font-size="10" fill="#7A6258">In-memory DB & native errors</text>
+
+            <rect x="15" y="110" width="170" height="55" rx="8" fill="#FDFBF9" stroke="#E8DFD5"/>
+            <text x="100" y="132" text-anchor="middle" font-size="12" font-weight="bold" fill="#7A6258">Pyodide (Python WASM)</text>
+            <text x="100" y="150" text-anchor="middle" font-size="10" fill="#7A6258">Sandboxed logic runner (Phase 2)</text>
+          </g>
+
+          <path d="M 680 125 L 715 125" stroke="#D88A8A" stroke-width="2.5" fill="none"/>
+
+          <!-- 4. Voice & Roast Engine -->
+          <g transform="translate(720, 35)">
+            <rect width="175" height="180" rx="12" fill="#FFFFFF" stroke="#D88A8A" stroke-width="2"/>
+            <text x="87" y="30" text-anchor="middle" font-weight="bold" fill="#B76262" font-size="13">voice.js (VOICE.md)</text>
+            
+            <rect x="12" y="45" width="151" height="35" rx="6" fill="#F9EBEA"/>
+            <text x="87" y="67" text-anchor="middle" font-size="10" font-weight="bold" fill="#B76262">Error → Roast & Fix</text>
+
+            <rect x="12" y="88" width="151" height="35" rx="6" fill="#F9EBEA"/>
+            <text x="87" y="110" text-anchor="middle" font-size="10" font-weight="bold" fill="#B76262">Attempt 3 → Gentle Reveal</text>
+
+            <rect x="12" y="130" width="151" height="35" rx="6" fill="#EBF4F0"/>
+            <text x="87" y="152" text-anchor="middle" font-size="10" font-weight="bold" fill="#5E8A75">Success → Cheer & Next</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Scoping & Sequencing Plan -->
+      <div class="card full-width">
+        <h2>⏱️ Delivery Plan & Phased Sequencing</h2>
+        <div class="roadmap-stage stage-1">
+          <span class="stage-badge" style="background: var(--rose-soft); color: var(--rose-dark);">Phase 1 (Core POC)</span>
+          <div>
+            <strong style="color: var(--mocha);">SQL Event Management Track (Complete)</strong>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.25rem;">
+              Build out the single-page chat UI, splash preloader, <code>sql.js</code> engine, full <code>VOICE.md</code> roast rules, hints, snippets, and 3-attempt reveal. Deliver the complete 60-second video demo candidate.
+            </p>
+          </div>
+        </div>
+
+        <div class="roadmap-stage stage-2">
+          <span class="stage-badge" style="background: var(--sage-soft); color: var(--sage);">Phase 2 (Layer)</span>
+          <div>
+            <strong style="color: var(--sage);">Python Quiz Application Track (Pyodide)</strong>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.25rem;">
+              Integrate Pyodide to run Python code and evaluate behavioral assertions. If time permits before deadline, activate track; otherwise marked "Coming Soon".
+            </p>
+          </div>
+        </div>
+
+        <div class="roadmap-stage stage-3">
+          <span class="stage-badge" style="background: var(--cream); color: var(--mocha);">Phase 3 (Ship)</span>
+          <div>
+            <strong style="color: var(--mocha);">GitHub Pages & Devpost Submission</strong>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.25rem;">
+              Enable GitHub Pages on the public repo, record the short walkthrough demo, and submit to Devpost.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Component Breakdown -->
+      <div class="card full-width">
+        <h2>📦 Component Architecture & File Mapping</h2>
+        <div class="tabs-nav">
+          <button class="tab-btn active" onclick="switchTab('core', this)">Core UI & State</button>
+          <button class="tab-btn" onclick="switchTab('engines', this)">Execution Engines</button>
+          <button class="tab-btn" onclick="switchTab('voice', this)">Voice & Roast Logic</button>
+          <button class="tab-btn" onclick="switchTab('files', this)">File Tree</button>
+        </div>
+
+        <!-- Core UI -->
+        <div id="tab-core" class="tab-pane active">
+          <div class="comp-item">
+            <div class="comp-header">
+              <span class="comp-name">Splash & Preloader</span>
+              <span class="comp-file">index.html + css/vintage-theme.css</span>
+            </div>
+            <div class="comp-ref">Implements: <code>prd.md > Screens and Layout (Surface 1)</code></div>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">
+              Welcoming mascot animation with "welcome hehe :0" intro. Warms up the WASM binary asynchronously in the background so the user never experiences lag once they enter.
+            </p>
+          </div>
+
+          <div class="comp-item">
+            <div class="comp-header">
+              <span class="comp-name">Chat Workspace & Input Controller</span>
+              <span class="comp-file">index.html + js/app.js</span>
+            </div>
+            <div class="comp-ref">Implements: <code>prd.md > Screens and Layout (Surface 2)</code></div>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">
+              Chronological conversation stream with styled Sugar bubbles, code blocks, multiline textarea, and instant action chips for <code>hint</code> and <code>help</code>.
+            </p>
+          </div>
+        </div>
+
+        <!-- Engines -->
+        <div id="tab-engines" class="tab-pane">
+          <div class="comp-item">
+            <div class="comp-header">
+              <span class="comp-name">SQL Execution Engine</span>
+              <span class="comp-file">js/sql-engine.js</span>
+            </div>
+            <div class="comp-ref">Implements: <code>prd.md > Track 2: SQL — Event Management System</code></div>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">
+              Uses in-memory <code>sql.js</code> to run student SQL commands. Inspects database schema for <code>CREATE TABLE events</code>, checks row counts for <code>INSERT INTO</code>, and checks result sets for <code>SELECT</code>. Passes SQLite error strings straight to <code>voice.js</code>.
+            </p>
+          </div>
+
+          <div class="comp-item">
+            <div class="comp-header">
+              <span class="comp-name">Python Engine (Phase 2 Layer)</span>
+              <span class="comp-file">js/python-engine.js</span>
+            </div>
+            <div class="comp-ref">Implements: <code>prd.md > Track 1: Python — Quiz Application</code></div>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">
+              Executes Python in Pyodide. Tests behavior by asserting list structure, looping logic, and score calculations without failing on whitespace variations.
+            </p>
+          </div>
+        </div>
+
+        <!-- Voice -->
+        <div id="tab-voice" class="tab-pane">
+          <div class="comp-item">
+            <div class="comp-header">
+              <span class="comp-name">Voice & Roast Engine</span>
+              <span class="comp-file">js/voice.js (Source: VOICE.md)</span>
+            </div>
+            <div class="comp-ref">Implements: <code>prd.md > Feedback & Roast Engine</code> & <code>VOICE.md</code></div>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">
+              Translates runtime errors into Sugar's signature older-sibling roast copy. Teases the query, never the student. Tracks consecutive errors and triggers the reveal after 3 attempts. Zero emojis on error messages.
+            </p>
+          </div>
+        </div>
+
+        <!-- File Tree -->
+        <div id="tab-files" class="tab-pane">
+          <pre>
+sugar/
+├── index.html              # Splash screen & main chat interface
+├── css/
+│   ├── main.css            # Layout, typography, resets
+│   └── vintage-theme.css   # Vintage brown & rose palette tokens, bubbles
+├── js/
+│   ├── app.js              # State machine, chat UI rendering, events
+│   ├── voice.js            # Sugar's dialogue, roasts, hints (VOICE.md rules)
+│   ├── sql-engine.js       # sql.js wrapper and Event System step validation
+│   └── python-engine.js    # Pyodide wrapper for Quiz App (Phase 2)
+├── devpost/                # Hackathon project artifacts
+│   ├── learner-profile.md
+│   ├── scope.md
+│   ├── prd.md
+│   └── spec.md
+├── VOICE.md                # Canonical voice guide
+└── .gitignore              # Ignores credentials & personal profile
+          </pre>
+        </div>
+      </div>
+
+      <!-- Where It Runs & Verification -->
+      <div class="card">
+        <h2>🚀 Where It Runs & Verification</h2>
+        <ul class="bullet-list">
+          <li><strong>Zero Build Setup:</strong> Double-click <code>index.html</code> or run <code>npx serve .</code> / <code>python -m http.server</code>.</li>
+          <li><strong>GitHub Pages:</strong> Publish directly from <code>main</code> branch root with 1 click in repo settings.</li>
+          <li><strong>60-Second Demo:</strong> Preloaded WASM allows immediate, fluid, bug-free recording without network latency.</li>
+        </ul>
+      </div>
+
+      <!-- Failure Modes & Safeguards -->
+      <div class="card">
+        <h2>🛡️ Key Failure Safeguards</h2>
+        <ul class="bullet-list">
+          <li><strong>WASM Preloader:</strong> Splash screen absorbs the initial engine download so chat starts warm.</li>
+          <li><strong>Frustration Barrier:</strong> Attempt 3 automatically reveals the working code with encouragement.</li>
+          <li><strong>Execution Timeout:</strong> 3-second guard catches infinite loops in user scripts.</li>
+        </ul>
+      </div>
+    </div>
+
+    <footer>
+      Companion document for Devpost Learn • Source of Truth: <code>devpost/spec.md</code>
+    </footer>
+  </div>
+
+  <script>
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+    }
+  </script>
+</body>
+</html>

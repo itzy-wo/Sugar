@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sugar — Product Requirements Companion</title>
+  <style>
+    :root {
+      --bg: #F7F3EE;
+      --card-bg: #FFFFFF;
+      --text-main: #3A231A;
+      --text-muted: #7A6258;
+      --mocha: #54382B;
+      --rose: #D88A8A;
+      --rose-soft: #F9EBEA;
+      --rose-dark: #B76262;
+      --cream: #EDE4D8;
+      --border: #E8DFD5;
+      --sage: #5E8A75;
+      --sage-soft: #EBF4F0;
+      --shadow: 0 4px 20px rgba(58, 35, 26, 0.06);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 2.5rem 1.25rem;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.3rem 0.85rem;
+      background: var(--rose-soft);
+      color: var(--rose-dark);
+      font-weight: 700;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 2.3rem;
+      color: var(--mocha);
+      margin-bottom: 0.5rem;
+    }
+    .tagline {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 720px;
+    }
+
+    .palette-strip {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .palette-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .swatch {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 768px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .card.full-width {
+      grid-column: 1 / -1;
+    }
+    .card h2 {
+      font-size: 1.25rem;
+      color: var(--mocha);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* SVG Diagram */
+    .svg-diagram {
+      width: 100%;
+      height: auto;
+      max-height: 300px;
+      margin: 1rem 0;
+    }
+
+    /* Tabs */
+    .tabs-nav {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 2px solid var(--cream);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 0.6rem 1.25rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-btn:hover {
+      background: var(--bg);
+      color: var(--text-main);
+    }
+    .tab-btn.active {
+      background: var(--rose-soft);
+      color: var(--rose-dark);
+    }
+    .tab-pane {
+      display: none;
+    }
+    .tab-pane.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Interactive Step Simulator */
+    .step-card {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border);
+    }
+    .step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .step-title {
+      font-weight: 700;
+      color: var(--mocha);
+      font-size: 1.05rem;
+    }
+    .step-pill {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      background: var(--cream);
+      color: var(--mocha);
+      font-weight: 600;
+    }
+
+    /* Chat bubble preview */
+    .chat-preview {
+      background: #FFFFFF;
+      border-radius: 12px;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      margin-top: 0.75rem;
+      font-family: var(--font);
+    }
+    .bubble {
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    .bubble.sugar {
+      background: var(--rose-soft);
+      color: var(--mocha);
+      border-left: 3px solid var(--rose);
+    }
+    .bubble.user {
+      background: #EAE6DF;
+      color: var(--text-main);
+      text-align: right;
+    }
+    .bubble.roast {
+      background: #FDF0F0;
+      color: #9E2A2B;
+      border-left: 3px solid #D88A8A;
+      font-weight: 500;
+    }
+    .bubble.success {
+      background: var(--sage-soft);
+      color: var(--sage);
+      border-left: 3px solid var(--sage);
+      font-weight: 500;
+    }
+    code {
+      font-family: var(--mono);
+      background: rgba(0,0,0,0.05);
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+
+    ul.bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+    ul.bullet-list li {
+      position: relative;
+      padding-left: 1.5rem;
+      font-size: 0.95rem;
+    }
+    ul.bullet-list li::before {
+      content: "•";
+      color: var(--rose);
+      font-size: 1.4rem;
+      position: absolute;
+      left: 0.25rem;
+      top: -0.25rem;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <span class="badge" style="background: var(--sage-soft); color: var(--sage);">PRD Status: Approved</span>
+      <h1>Sugar — Product Requirements</h1>
+      <p class="tagline">A cute but savage conversational tutor that guides students through practical Python and SQL projects step-by-step, playfully roasting mistakes so they escape tutorial hell.</p>
+      
+      <div class="palette-strip">
+        <span class="palette-label">Vintage Palette:</span>
+        <span class="swatch" style="background: #F7F3EE; color: #54382B;">#F7F3EE Cream</span>
+        <span class="swatch" style="background: #54382B; color: #FFFFFF;">#54382B Mocha</span>
+        <span class="swatch" style="background: #D88A8A; color: #FFFFFF;">#D88A8A Vintage Rose</span>
+        <span class="swatch" style="background: #EDE4D8; color: #3A231A;">#EDE4D8 Latte</span>
+        <span class="swatch" style="background: #5E8A75; color: #FFFFFF;">#5E8A75 Sage</span>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Full Journey Diagram -->
+      <div class="card full-width">
+        <h2>🗺️ The Core Journey & Roast Feedback Loop</h2>
+        <svg class="svg-diagram" viewBox="0 0 900 240" xmlns="http://www.w3.org/2000/svg">
+          <rect width="900" height="240" rx="16" fill="#FDFBF9" stroke="#E8DFD5" stroke-width="1.5"/>
+
+          <!-- Step 1: Splash -->
+          <g transform="translate(25, 45)">
+            <rect width="145" height="150" rx="12" fill="#FFFFFF" stroke="#D88A8A" stroke-width="2"/>
+            <text x="72" y="32" text-anchor="middle" font-weight="bold" fill="#54382B" font-size="13">1. Splash Screen</text>
+            <text x="72" y="65" text-anchor="middle" font-size="28">🧊</text>
+            <text x="72" y="98" text-anchor="middle" fill="#7A6258" font-size="11">Cute Loading Screen</text>
+            <text x="72" y="115" text-anchor="middle" fill="#B76262" font-size="11" font-weight="bold">"welcome hehe :0"</text>
+            <text x="72" y="133" text-anchor="middle" fill="#7A6258" font-size="10">Auto / Tap entry</text>
+          </g>
+
+          <path d="M 175 120 L 205 120" stroke="#D88A8A" stroke-width="2.5" fill="none"/>
+
+          <!-- Step 2: Track Select -->
+          <g transform="translate(210, 45)">
+            <rect width="155" height="150" rx="12" fill="#FFFFFF" stroke="#54382B" stroke-width="2"/>
+            <text x="77" y="32" text-anchor="middle" font-weight="bold" fill="#54382B" font-size="13">2. Pick Track</text>
+            <rect x="12" y="50" width="131" height="38" rx="6" fill="#EDE4D8"/>
+            <text x="77" y="67" text-anchor="middle" fill="#54382B" font-size="11" font-weight="bold">Python Track</text>
+            <text x="77" y="81" text-anchor="middle" fill="#7A6258" font-size="10">Quiz Application</text>
+
+            <rect x="12" y="95" width="131" height="38" rx="6" fill="#EDE4D8"/>
+            <text x="77" y="112" text-anchor="middle" fill="#54382B" font-size="11" font-weight="bold">SQL Track</text>
+            <text x="77" y="126" text-anchor="middle" fill="#7A6258" font-size="10">Event System</text>
+          </g>
+
+          <path d="M 370 120 L 400 120" stroke="#54382B" stroke-width="2.5" fill="none"/>
+
+          <!-- Step 3: 3-Step Guided Loop -->
+          <g transform="translate(405, 30)">
+            <rect width="280" height="180" rx="12" fill="#FFFFFF" stroke="#D88A8A" stroke-width="2"/>
+            <text x="140" y="26" text-anchor="middle" font-weight="bold" fill="#54382B" font-size="13">3. Interactive 3-Step Build</text>
+            <text x="140" y="44" text-anchor="middle" fill="#7A6258" font-size="11">Student types code directly in chat</text>
+
+            <rect x="15" y="55" width="250" height="36" rx="6" fill="#FDF0F0" stroke="#D88A8A" stroke-dasharray="3,3"/>
+            <text x="140" y="71" text-anchor="middle" fill="#9E2A2B" font-size="10" font-weight="bold">Wrong? Savage Roast & Nudge</text>
+            <text x="140" y="84" text-anchor="middle" fill="#9E2A2B" font-size="9">Keywords: `hint` (clue) | `help` (snippet)</text>
+
+            <rect x="15" y="98" width="250" height="30" rx="6" fill="#FFF5EB"/>
+            <text x="140" y="117" text-anchor="middle" fill="#7A6258" font-size="10">Empty/Gibberish? "Recipe for confusion..."</text>
+
+            <rect x="15" y="135" width="250" height="30" rx="6" fill="#EBF4F0" stroke="#5E8A75"/>
+            <text x="140" y="154" text-anchor="middle" fill="#5E8A75" font-size="11" font-weight="bold">Right? Celebrate & Advance (1 → 2 → 3)</text>
+          </g>
+
+          <path d="M 690 120 L 720 120" stroke="#5E8A75" stroke-width="2.5" fill="none"/>
+
+          <!-- Step 4: Finish & Take-home -->
+          <g transform="translate(725, 45)">
+            <rect width="150" height="150" rx="12" fill="#FFFFFF" stroke="#5E8A75" stroke-width="2"/>
+            <text x="75" y="32" text-anchor="middle" font-weight="bold" fill="#5E8A75" font-size="13">4. Completion</text>
+            <text x="75" y="60" text-anchor="middle" fill="#54382B" font-size="11" font-weight="bold">Full Code Display</text>
+            <text x="75" y="78" text-anchor="middle" fill="#7A6258" font-size="10">Ready to copy & run</text>
+            <rect x="10" y="95" width="130" height="40" rx="6" fill="#EDE4D8"/>
+            <text x="75" y="112" text-anchor="middle" fill="#54382B" font-size="10" font-weight="bold">Take-Home Prompt:</text>
+            <text x="75" y="127" text-anchor="middle" fill="#7A6258" font-size="9">Password / Concert App</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Curated Tracks Detail -->
+      <div class="card full-width">
+        <h2>📚 Curated Project Tracks (3 Steps Each)</h2>
+        <div class="tabs-nav">
+          <button class="tab-btn active" onclick="switchTab('python', this)">🐍 Python Track: Quiz App</button>
+          <button class="tab-btn" onclick="switchTab('sql', this)">🗄️ SQL Track: Event System</button>
+          <button class="tab-btn" onclick="switchTab('roast', this)">🔥 Roast & Helper Engine</button>
+        </div>
+
+        <!-- Python Track -->
+        <div id="tab-python" class="tab-pane active">
+          <div class="grid" style="margin-bottom: 0;">
+            <div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="step-title">Step 1: Data Setup</span>
+                  <span class="step-pill">Lists & Dictionaries</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                  Sugar introduces questions representation: create a list of dicts with <code>question</code>, <code>options</code>, and <code>answer</code>.
+                </p>
+              </div>
+
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="step-title">Step 2: Loop & Prompt</span>
+                  <span class="step-pill">Loops & Input</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                  Iterate through each question, print choices, and capture player response with <code>input()</code>.
+                </p>
+              </div>
+
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="step-title">Step 3: Verification & Score</span>
+                  <span class="step-pill">Conditions & Output</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                  Compare answer, increment <code>score</code>, and output the final result calculation.
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h3 style="font-size: 1rem; color: var(--mocha); margin-bottom: 0.75rem;">Take-Home Project Challenge</h3>
+              <div class="step-card" style="border-left: 4px solid var(--rose);">
+                <strong>Password Strength Checker</strong>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 0.5rem;">
+                  Delivered on completion: an independent prompt instructing the student to build a script evaluating length, numbers, and symbols without Sugar inspecting it.
+                </p>
+              </div>
+
+              <div class="chat-preview">
+                <div class="bubble sugar">Sugar: "Ready to bake up something fun? Let's build a Quiz App together. Step 1: define a list of 2 question dictionaries with options and answers. Show me your code!"</div>
+                <div class="bubble user">User: <code>questions = [{"q": "...", "a": "..."}]</code></div>
+                <div class="bubble success">Sugar: "Yes! That list is clean and sweet. Step 1 down, now let's loop through them."</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SQL Track -->
+        <div id="tab-sql" class="tab-pane">
+          <div class="grid" style="margin-bottom: 0;">
+            <div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="step-title">Step 1: Schema Creation</span>
+                  <span class="step-pill">CREATE TABLE</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                  Create the <code>events</code> table with <code>id</code>, <code>title</code>, <code>event_date</code>, and <code>venue</code>.
+                </p>
+              </div>
+
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="step-title">Step 2: Data Population</span>
+                  <span class="step-pill">INSERT INTO</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                  Insert sample upcoming events into the table.
+                </p>
+              </div>
+
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="step-title">Step 3: Query & Filter</span>
+                  <span class="step-pill">SELECT & WHERE</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                  Write a query retrieving upcoming events filtered by date and venue ordered chronologically.
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h3 style="font-size: 1rem; color: var(--mocha); margin-bottom: 0.75rem;">Take-Home Project Challenge</h3>
+              <div class="step-card" style="border-left: 4px solid var(--rose);">
+                <strong>Concert Management System</strong>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 0.5rem;">
+                  Delivered on completion: an independent prompt instructing the student to design multi-table schemas for artists, venues, and ticket bookings.
+                </p>
+              </div>
+
+              <div class="chat-preview">
+                <div class="bubble sugar">Sugar: "Time for some SQL. Step 1: Create an `events` table with id, title, event_date, and venue. Don't forget your primary key!"</div>
+                <div class="bubble user">User: <code>MAKE TABLE events...</code></div>
+                <div class="bubble roast">Sugar: "Tables aren't built in woodshop here. SQL uses CREATE TABLE. Swap that verb in."</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Roast Engine -->
+        <div id="tab-roast" class="tab-pane">
+          <div class="chat-preview">
+            <h4 style="margin-bottom: 0.75rem; color: var(--mocha);">Voice Guide & Roast Interaction Examples (from VOICE.md):</h4>
+            
+            <div class="bubble user">User: <code>asdfasdf hello</code></div>
+            <div class="bubble roast">Sugar: "That input looks like a recipe for confusion. Let's stick to the code so we can finish this project."</div>
+
+            <div class="bubble user">User: <code>SELECT * FROM student</code> (Wrong table name)</div>
+            <div class="bubble roast">Sugar: "There's no table called student. There IS one called students. One tiny letter, big drama. Add the s."</div>
+
+            <div class="bubble user">User: <code>hint</code></div>
+            <div class="bubble sugar">Sugar: "Conceptual clue: Square brackets [] hold the list, and curly braces {} hold each question."</div>
+
+            <div class="bubble user">User: <code>help</code></div>
+            <div class="bubble sugar">Sugar: "Working snippet: Here is the structure you want:<br><code>questions = [{'question': '2+2?', 'options': ['3', '4'], 'answer': '4'}]</code>"</div>
+
+            <div class="bubble sugar">Sugar (after 3 failed tries): "Okay, that one fought back. Here's the answer. Read it once, then go win the next one. Even pros look this up."</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Boundaries & Verification -->
+      <div class="card">
+        <h2>✅ Observable Acceptance Criteria</h2>
+        <ul class="bullet-list">
+          <li><strong>Loading Screen:</strong> Mascot and welcome splash appear on load, transitioning smoothly into the workspace.</li>
+          <li><strong>Track Switching:</strong> User can switch between Python Quiz App and SQL Event System at any time.</li>
+          <li><strong>Error Handling:</strong> Wrong submissions trigger humorous roasts + corrective feedback.</li>
+          <li><strong>Special Triggers:</strong> <code>hint</code> shows clues, <code>help</code> shows snippets, and nonsense triggers Sugar's blunt warning.</li>
+          <li><strong>Completion Display:</strong> Full code block renders alongside the uninspected take-home challenge prompt.</li>
+        </ul>
+      </div>
+
+      <!-- Explicit Cuts & Deferred -->
+      <div class="card">
+        <h2>🚫 Cuts & Deferred Boundaries</h2>
+        <ul class="bullet-list">
+          <li><strong>No Arbitrary Theme Inputs:</strong> Kept strictly to curated high-impact Quiz App and Event System.</li>
+          <li><strong>No Multi-window IDE:</strong> Everything happens inside the chatbox for speed and simplicity.</li>
+          <li><strong>No Backend Database / Auth:</strong> Zero signup friction; client-side single page app.</li>
+          <li><strong>No WASM Code Runner:</strong> Validates logic through pattern/keyword verification rather than running arbitrary binaries in POC.</li>
+        </ul>
+      </div>
+    </div>
+
+    <footer>
+      Companion document for Devpost Learn • Source of Truth: <code>devpost/prd.md</code>
+    </footer>
+  </div>
+
+  <script>
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+    }
+  </script>
+</body>
+</html>

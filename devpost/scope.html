@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sugar — Project Scope Companion</title>
+  <style>
+    :root {
+      --bg: #faf7f2;
+      --card-bg: #ffffff;
+      --text: #2d3142;
+      --text-muted: #6c757d;
+      --accent: #f28482;
+      --accent-soft: #fde8e7;
+      --primary: #84a59d;
+      --primary-dark: #5c7b74;
+      --secondary: #f6bd60;
+      --border: #f0ebe1;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    header {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    header::after {
+      content: "🍬";
+      position: absolute;
+      right: 20px;
+      top: 15px;
+      font-size: 4rem;
+      opacity: 0.15;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 2.4rem;
+      margin-bottom: 0.5rem;
+      color: #1f222e;
+    }
+    .tagline {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 650px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 768px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #1f222e;
+    }
+    .kernel-card {
+      grid-column: 1 / -1;
+      border-left: 6px solid var(--accent);
+      background: linear-gradient(135deg, #ffffff 0%, #fffcf8 100%);
+    }
+    .diagram-card {
+      grid-column: 1 / -1;
+    }
+    .svg-diagram {
+      width: 100%;
+      height: auto;
+      max-height: 280px;
+      margin: 1.5rem 0 0.5rem;
+    }
+    /* Stepper */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .step-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      background: #faf7f2;
+      border: 1px solid var(--border);
+    }
+    .step-num {
+      background: var(--primary);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    /* Tabs for Scope Boundary */
+    .boundary-section {
+      grid-column: 1 / -1;
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .tabs-nav {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-btn:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+    .tab-btn.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .tab-pane {
+      display: none;
+    }
+    .tab-pane.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    ul.bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    ul.bullet-list li {
+      position: relative;
+      padding-left: 1.5rem;
+    }
+    ul.bullet-list li::before {
+      content: "•";
+      color: var(--primary);
+      font-size: 1.4rem;
+      position: absolute;
+      left: 0.25rem;
+      top: -0.25rem;
+    }
+    .cut-list li::before {
+      content: "✕";
+      color: #e63946;
+      font-size: 0.9rem;
+      top: 0.1rem;
+    }
+    .later-list li::before {
+      content: "⏳";
+      font-size: 0.9rem;
+      top: 0.1rem;
+    }
+    .proof-box {
+      background: #f4f8f7;
+      border: 1px solid #dce8e5;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-top: 1rem;
+    }
+    .proof-box strong {
+      color: var(--primary-dark);
+    }
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <span class="badge" style="background: #eaf4f1; color: #5c7b74;">Status: Approved</span>
+      <h1>Sugar</h1>
+      <p class="tagline">A cute but savage chatbot that pulls students out of tutorial hell by teaching Python and SQL through curated, genuinely useful projects they actually build.</p>
+    </header>
+
+    <div class="grid">
+      <!-- Unique Kernel -->
+      <div class="card kernel-card">
+        <h2>🌶️ The Unique Kernel</h2>
+        <p style="font-size: 1.15rem; font-weight: 500; color: #1f222e;">
+          <strong>Cute on the outside, savage on the inside.</strong>
+        </p>
+        <p style="margin-top: 0.5rem; color: var(--text);">
+          Sugar delivers bite-sized explanations in plain English, guides you through a curated, genuinely useful project (like a practical Python tool or SQL database), and playfully roasts you whenever you submit wrong answers—turning dry theory into active, memorable building sessions.
+        </p>
+      </div>
+
+      <!-- Who it's For -->
+      <div class="card">
+        <h2>🎯 Who It's For</h2>
+        <p>
+          Students and beginner coders stuck in <strong>"tutorial hell"</strong> who know basic syntax from endless video lectures, but freeze when trying to write real code from scratch.
+        </p>
+        <div class="proof-box" style="margin-top: 1rem;">
+          <strong>The Shift:</strong> Moving away from passive video-watching to typing real code in response to prompt challenges.
+        </div>
+      </div>
+
+      <!-- Inspiration & Identity -->
+      <div class="card">
+        <h2>✨ Inspiration & Identity</h2>
+        <p><strong>Aesthetic:</strong> "Normal cute"—charming, clean, welcoming, and warm without being babyish or overly pink.</p>
+        <p style="margin-top: 0.5rem;"><strong>Personality:</strong> Playful roaster. Sharp, witty, and savage when you make silly mistakes, but always encouraging you back on track.</p>
+      </div>
+
+      <!-- Interactive Architecture Diagram -->
+      <div class="card diagram-card">
+        <h2>🗺️ The User Journey & Core Loop</h2>
+        <svg class="svg-diagram" viewBox="0 0 800 220" xmlns="http://www.w3.org/2000/svg">
+          <!-- Background -->
+          <rect width="800" height="220" rx="16" fill="#fdfbf7" stroke="#e8e2d8" stroke-width="1.5"/>
+
+          <!-- Step 1: User chooses -->
+          <g transform="translate(30, 40)">
+            <rect width="150" height="130" rx="12" fill="#ffffff" stroke="#84a59d" stroke-width="2"/>
+            <text x="75" y="35" text-anchor="middle" font-weight="bold" fill="#2d3142" font-size="14">1. Track Selection</text>
+            <text x="75" y="65" text-anchor="middle" fill="#6c757d" font-size="12">Pick Curated Track</text>
+            <text x="75" y="85" text-anchor="middle" font-weight="bold" fill="#84a59d" font-size="12">Python or SQL</text>
+            <text x="75" y="110" text-anchor="middle" fill="#6c757d" font-size="11">Useful Real Project</text>
+          </g>
+
+          <!-- Arrow 1 -->
+          <path d="M 185 105 L 225 105" stroke="#84a59d" stroke-width="2.5" fill="none"/>
+
+          <!-- Step 2: Step-by-Step Task -->
+          <g transform="translate(230, 40)">
+            <rect width="160" height="130" rx="12" fill="#ffffff" stroke="#f6bd60" stroke-width="2"/>
+            <text x="80" y="35" text-anchor="middle" font-weight="bold" fill="#2d3142" font-size="14">2. Step-by-Step</text>
+            <text x="80" y="65" text-anchor="middle" fill="#6c757d" font-size="12">Sugar gives 1 task</text>
+            <text x="80" y="85" text-anchor="middle" fill="#6c757d" font-size="12">Student types code</text>
+            <text x="80" y="110" text-anchor="middle" font-weight="bold" fill="#f6bd60" font-size="11">Directly in Chatbox</text>
+          </g>
+
+          <!-- Arrow 2 -->
+          <path d="M 395 105 L 435 105" stroke="#f6bd60" stroke-width="2.5" fill="none"/>
+
+          <!-- Step 3: Savage Evaluation Loop -->
+          <g transform="translate(440, 25)">
+            <rect width="165" height="160" rx="12" fill="#ffffff" stroke="#f28482" stroke-width="2"/>
+            <text x="82" y="30" text-anchor="middle" font-weight="bold" fill="#2d3142" font-size="13">3. Sugar Feedback</text>
+            <rect x="15" y="45" width="135" height="42" rx="8" fill="#fde8e7"/>
+            <text x="82" y="62" text-anchor="middle" fill="#e63946" font-size="11" font-weight="bold">Wrong? Roast & Nudge</text>
+            <text x="82" y="78" text-anchor="middle" fill="#e63946" font-size="10">"One tiny letter, big drama. Add the s."</text>
+            
+            <rect x="15" y="98" width="135" height="42" rx="8" fill="#eaf4f1"/>
+            <text x="82" y="115" text-anchor="middle" fill="#5c7b74" font-size="11" font-weight="bold">Right? Celebrate!</text>
+            <text x="82" y="131" text-anchor="middle" fill="#5c7b74" font-size="10">Advance to next step</text>
+          </g>
+
+          <!-- Arrow 3 -->
+          <path d="M 610 105 L 645 105" stroke="#84a59d" stroke-width="2.5" fill="none"/>
+
+          <!-- Step 4: Finish & Take-Home -->
+          <g transform="translate(650, 40)">
+            <rect width="125" height="130" rx="12" fill="#ffffff" stroke="#84a59d" stroke-width="2"/>
+            <text x="62" y="35" text-anchor="middle" font-weight="bold" fill="#2d3142" font-size="13">4. Wrap-up</text>
+            <text x="62" y="65" text-anchor="middle" fill="#5c7b74" font-size="11" font-weight="bold">Complete!</text>
+            <text x="62" y="90" text-anchor="middle" fill="#6c757d" font-size="10">Take-home</text>
+            <text x="62" y="105" text-anchor="middle" fill="#6c757d" font-size="10">independent</text>
+            <text x="62" y="120" text-anchor="middle" fill="#6c757d" font-size="10">challenge</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Boundaries: Now / Later / Cut -->
+      <div class="boundary-section">
+        <h2>📦 Scope Boundaries</h2>
+        <div class="tabs-nav">
+          <button class="tab-btn active" onclick="switchTab('now', this)">Now (POC Boundary)</button>
+          <button class="tab-btn" onclick="switchTab('later', this)">Later (Roadmap)</button>
+          <button class="tab-btn" onclick="switchTab('cut', this)">Explicitly Cut</button>
+        </div>
+
+        <div id="tab-now" class="tab-pane active">
+          <ul class="bullet-list">
+            <li><strong>Single-Page Chat Interface:</strong> Clean, charming "normal cute" styling with instant conversational responsiveness.</li>
+            <li><strong>2 Curated Tracks:</strong> 1 genuinely useful Python utility project and 1 practical SQL database project.</li>
+            <li><strong>Savage & Warm Feedback:</strong> Distinctive witty roasts for mistaken code + clear hints to guide them forward.</li>
+            <li><strong>1 Guided Project + 1 Take-Home Challenge:</strong> Hands-on build loop during the session, and an uninspected challenge project prompt at the finish.</li>
+          </ul>
+        </div>
+
+        <div id="tab-later" class="tab-pane">
+          <ul class="bullet-list later-list">
+            <li><strong>Dynamic Theme/Interest Selection:</strong> Allowing arbitrary user themes (e.g. anime, sports) once core tracks are solid.</li>
+            <li><strong>Real Code Sandbox:</strong> In-browser runtime execution environment (e.g., Pyodide / SQLite WebAssembly).</li>
+            <li><strong>Automated Challenge Grading:</strong> Inspecting the post-session take-home projects.</li>
+            <li><strong>User Accounts & Persistence:</strong> Saving student progress, badges, and past roast history across sessions.</li>
+          </ul>
+        </div>
+
+        <div id="tab-cut" class="tab-pane">
+          <ul class="bullet-list cut-list">
+            <li><strong>Arbitrary Open-Ended Interest Prompts:</strong> Streamlined in the POC to curated, high-impact projects to eliminate setup friction and guarantee quality.</li>
+            <li><strong>Multi-window IDE / File Tree:</strong> Cut to keep the student focused strictly in the chatbox for the hackathon proof-of-concept.</li>
+            <li><strong>Babyish / Over-the-top Pink Kawaii:</strong> Cut in favor of balanced, approachable, "normal cute" design.</li>
+            <li><strong>Complex User Auth & Cloud Database:</strong> Cut to guarantee a zero-friction, fast 1-minute demo.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- What Working Looks Like -->
+      <div class="card diagram-card">
+        <h2>🎬 What "Working" Looks Like (The 60-Second Demo)</h2>
+        <div class="steps">
+          <div class="step-item">
+            <span class="step-num">1</span>
+            <div><strong>Launch Sugar:</strong> Greeted by a clean, friendly chat interface with Sugar's welcoming introduction.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-num">2</span>
+            <div><strong>Select Curated Project:</strong> User picks a track (e.g. practical Python project).</div>
+          </div>
+          <div class="step-item">
+            <span class="step-num">3</span>
+            <div><strong>The Savage Beat:</strong> Sugar sets up the practical project; user inputs a wrong answer and Sugar drops a hilarious, friendly roast with a guiding hint.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-num">4</span>
+            <div><strong>Success & Wrap-up:</strong> User corrects the code, Sugar celebrates and completes the project, and delivers the independent challenge prompt.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Companion document for Devpost Learn • Source of Truth: <code>devpost/scope.md</code>
+    </footer>
+  </div>
+
+  <script>
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+    }
+  </script>
+</body>
+</html>
